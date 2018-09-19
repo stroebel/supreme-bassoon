@@ -1,8 +1,8 @@
 #ifndef JACOBI_H
 #define JACOBI_H
 
-#include <stdexcept>
 #include <armadillo>
+#include <tuple>
 
 using namespace arma;
 
@@ -12,16 +12,18 @@ using namespace arma;
         maximum number of iterations; error tolerance
  Output: Approximate solution of the system or an error message
 
- Ref: Burden, R., Faires, D., Burden, A. 2016. Numerical Analysis, 10rd ed.
+ Ref: Burden, R., Faires, D., Burden, A. 2016. Numerical Analysis, 10th ed.
       Cengage: Somewhere awful.
  */
-vec jacobi(const mat &A, const mat &b, vec &XO, const int N, const double TOL)
+std:: tuple<vec, std:: string>
+  jacobi(const mat &A, const mat &b, const vec &XO, const int N, const double TOL)
 {
   /* First draft: Too much copying of vectors */
   int k = 0;
 
   int n = b.size() - 1;
-  vec x = XO;
+  vec x(4);
+  vec x0 = XO;
   double sum;
   vec temp;
 
@@ -30,18 +32,18 @@ vec jacobi(const mat &A, const mat &b, vec &XO, const int N, const double TOL)
       for (int i = 0; i <= n; i++)
         {
           sum = 0;
-          /* Using access with range checking here cf. Eigen documentation */
+          /* Using access with range checking here cf. armadillo documentation */
           for (int j = 0; j <=n; j++)
             if (j != i)
-              sum = sum + A(i, j)*XO(j);
+              sum = sum + A(i, j)*x0(j);
           x(i) = (b(i) - sum)/A(i, i);
         }
-      if (norm(x - XO, "inf") < TOL)
-        return x;
-      XO = x;
+      if (norm(x - x0, "inf") < TOL)
+        return std:: make_tuple(x, "Tolerance reached");
+      k++;
+      x0 = x;
     }
-  /* I am like Oprah, but with exceptions */
-  throw std::runtime_error("Maximum number of iterations exceeded");
+  return std:: make_tuple(x, "Number of iterations exceeded");
 }
 
 #endif

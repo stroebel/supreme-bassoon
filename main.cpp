@@ -1,7 +1,9 @@
 #include <iostream>
 #include <armadillo>
+#include <tuple>
 
 #include "include/jacobi.h"
+#include "include/Gauss-Seidel.h"
 
 using namespace arma;
 
@@ -15,16 +17,28 @@ int main()
   };
 
   vec b = { 6, 25, -11, 15};
-  std::cout << "Armadillo solver solution" << std::endl;
-  std::cout << solve(A, b) << std::endl;
+  vec x(4, fill:: zeros);
 
-  mat s(4,4);
-  vec x(4, fill::zeros);
+  std:: string output;
 
-  s = jacobi(A, b, x, 20, 0.0001);
+  std:: cout << "Armadillo solver solution" << std:: endl;
+  std:: cout << solve(A, b) << std:: endl;
+
+  vec s1(4);
+
+  std:: tie(s1, output) = jacobi(A, b, x, 50, 0.005);
 
   std:: cout << "Jacobi iterative solver" << std:: endl;
-  std:: cout << s << std:: endl;
+  std:: cout << output << std:: endl;
+  std:: cout << s1 << std:: endl;
+
+  vec s2(4);
+
+  std:: tie(s2, output) = gauss_seidel(A, b, x, 50, 0.005);
+
+  std:: cout << "Gauss_seidel iterative solver" << std:: endl;
+  std:: cout << output << std:: endl;
+  std:: cout << s2 << std:: endl;
 
   return 0;
 }
