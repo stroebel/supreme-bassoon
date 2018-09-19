@@ -2,15 +2,12 @@
 #define JACOBI_H
 
 #include <stdexcept>
+#include <armadillo>
 
-#include <eigen3/Eigen/Core>
-#include "typedefs.h"
-
-using Eigen::VectorXd;
-using Eigen::MatrixXd;
+using namespace arma;
 
 /*
- Linear equation solution by Jacobi iterative technique.
+ Linear equation solution by Jacobi iterative method.
  Input: Number of equations; a matrix A; a vector b; initial guess;
         maximum number of iterations; error tolerance
  Output: Approximate solution of the system or an error message
@@ -18,33 +15,28 @@ using Eigen::MatrixXd;
  Ref: Burden, R., Faires, D., Burden, A. 2016. Numerical Analysis, 10rd ed.
       Cengage: Somewhere awful.
  */
-VectorXd jacobi(const MatrixXd &A, const VectorXd &b, VectorXd &XO, const Int N, const Doub TOL)
+vec jacobi(const mat &A, const mat &b, vec &XO, const int N, const double TOL)
 {
   /* First draft: Too much copying of vectors */
-  Int k = 0;
+  int k = 0;
 
-  /* Because who doesn't like explosions */
-  if (A.rows() > b.size()) throw std::runtime_error("System overdetermined.");
-  if (A.rows() < b.size()) throw std::runtime_error("System underdetermined.");
-
-  Int n = b.size() - 1;
-  VectorXd x = XO;
-  Doub sum;
-  VectorXd temp;
+  int n = b.size() - 1;
+  vec x = XO;
+  double sum;
+  vec temp;
 
   while (k <= N)
     {
-      for (Int i = 0; i <= n; i++)
+      for (int i = 0; i <= n; i++)
         {
           sum = 0;
           /* Using access with range checking here cf. Eigen documentation */
-          for (Int j = 0; j <=n; j++)
+          for (int j = 0; j <=n; j++)
             if (j != i)
               sum = sum + A(i, j)*XO(j);
           x(i) = (b(i) - sum)/A(i, i);
         }
-      temp = x - XO;
-      if (temp.norm() < TOL)
+      if (norm(x - XO, "inf") < TOL)
         return x;
       XO = x;
     }

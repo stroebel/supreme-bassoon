@@ -1,28 +1,30 @@
 #include <iostream>
+#include <armadillo>
 
-#include <eigen3/Eigen/Core>
-#include "include/typedefs.h"
 #include "include/jacobi.h"
 
-using Eigen::MatrixXd;
-using Eigen::VectorXd;
+using namespace arma;
 
 int main()
 {
-  MatrixXd A(4, 4);
-  VectorXd b(4), m(4);
-  VectorXd x0 = VectorXd::Zero(4);
+  mat A = {
+    {10, -1, 2, 0},
+    {-1, 11, -1, 3},
+    {2, -1, 10, -1},
+    {0, 3, -1, 8}
+  };
 
-  A(0, 0) = 10; A(0, 1) = -1; A(0, 2) = 2; A(0, 3) = 0;
-  A(1, 0) = -1; A(1, 1) = 11; A(1, 2) = -1; A(1, 3) = 3;
-  A(2, 0) = 2; A(2, 1) = -1; A(2, 2) = 10; A(2, 3) = -1;
-  A(3, 0) = 0; A(3, 1) = 3; A(3, 2) = -1; A(3, 3) = 8;
+  vec b = { 6, 25, -11, 15};
+  std::cout << "Armadillo solver solution" << std::endl;
+  std::cout << solve(A, b) << std::endl;
 
-  b(0) = 6; b(1) = 25; b(2) = -11; b(3) = 15;
+  mat s(4,4);
+  vec x(4, fill::zeros);
 
-  m = jacobi(A, b, x0, 20, 0.005);
+  s = jacobi(A, b, x, 20, 0.0001);
 
-  std::cout << m << std::endl;
+  std:: cout << "Jacobi iterative solver" << std:: endl;
+  std:: cout << s << std:: endl;
 
   return 0;
 }
